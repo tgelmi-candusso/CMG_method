@@ -1,0 +1,48 @@
+####Linear.distances() function
+#example data
+time <- c("11:00", "11:30", "12:00", "12:30", "13:00", "13:30")
+year <- c(2012,2012,2012,2012)
+month <- c(12,12,12,12, 12)
+day <- c(14,14,14,14,14,14)
+xUTM <- c(704265,704256, 704249, 704146, 704090, 704010)
+yUTM <- c(9517640, 9517554, 9517526, 9517567, 9517564, 9517571)
+
+#to load data from a csv file
+# trial <- read_csv("~/linearmovement_automatization_trial.csv", 
+#                   locale = locale(date_format = "%Y-%m-%d", 
+#                                   time_format = "%H:%M:%S",tz = "UTC"))
+# trial$Time ->time #format  "%H:%M" if "%H:%M:%S" then add +x[3]/1200 to function
+# trial$Year -> year
+# trial$Month -> month
+# trial$Day -> day #data points have to be in chronological order
+# trial$X -> xUTM
+# trial$Y -> yUTM
+
+linear.distances <- function (time, year, month, day, xUTM, yUTM){
+  timeN <- sapply(strsplit(time,":"),
+         function(x) {
+           x <- as.numeric(x)
+           x[1]+x[2]/60#+x[3]/1200
+         } ) #converts time to decimal (e.g 11:30=11.5, 01:00 = 1.0)
+  time_interval <- abs(apply(combn(timeN,2), 2, diff))
+  year_interval <- abs(apply(combn(year,2), 2, diff))
+  month_interval <- abs(apply(combn(month,2), 2, diff)) 
+  day_interval <- abs(apply(combn(day,2), 2, diff)) 
+  X_interval <- abs(apply(combn(xUTM,2), 2, diff)) 
+  Y_interval <- abs(apply(combn(yUTM,2), 2, diff)) 
+  distance_interval <- sqrt(X_interval+Y_interval) 
+  date_interval <- year_interval+month_interval+day_interval
+  comb <- data.frame (date_interval, distance_interval,time_interval)
+  daily_linear_travel_paths <- comb[ which(comb$date_interval == 0), ]
+  daily_linear_travel_paths$date_interval <- NULL
+  return(daily_linear_travel_paths)
+} 
+
+linear.distances (time, year, month, day, xUTM, yUTM) -> daily_linear_travel
+
+
+### to restrict linear travel paths to those within the gut passage time of a particular plant species:
+#e.g. gut passage of 1-2hrs
+
+CMG_SDDestimates <- daily_linear_travel[daily_linear_travel$time %in% c(1,1.5,2),] 
+
