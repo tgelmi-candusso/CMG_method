@@ -1,4 +1,4 @@
-# CMG_method
+# Model to estimate seed dispersal distance using movement data (CMG method)
 Seed dispersal distance (SDD) estimates using the CMG method (combination of movement data and gut passage). Here I describe the function I created to extract SDD estimates directly from chronologically ordered movement data, obtained through behavioral scan sampling or with tracking devices.
 The function is called linear.distances() and it calculates the distance between each consecutive position recorded and the time interval between the two consecutive positions.
 The data must be inchronological order, with time, day, month and year in separate columns. 
